@@ -647,6 +647,34 @@ const VERTICES = {
         ],
         "indices": [0, 1, 1, 2, 2, 3, 3, 0]
     },
+    "locomotive": {
+        "positions": [
+             0.00, -3.00,
+            -0.80, -2.40,
+            -0.80,  3.00,
+             0.80,  3.00,
+             0.80, -2.40
+        ],
+        "indices": [0, 1, 1, 2, 2, 3, 3, 4, 4, 0]
+    },
+    "cargo-wagon": {
+        "positions": [
+            -0.80, -3.00,
+            -0.80,  3.00,
+             0.80,  3.00,
+             0.80, -3.00
+        ],
+        "indices": [0, 1, 1, 2, 2, 3, 3, 0]
+    },
+    "fluid-wagon": {
+        "positions": [
+            -0.80, -3.00,
+            -0.80,  3.00,
+             0.80,  3.00,
+             0.80, -3.00
+        ],
+        "indices": [0, 1, 1, 2, 2, 3, 3, 0]
+    },
     "rect1x2": {
         "positions": [
             -0.40,  0.90,
@@ -944,6 +972,10 @@ const init = () => {
     addCircleVertices('nuclear-reactor', 2.0, 0, 0, 32);
     addCircleVertices('storage-tank', 1.4, 0, 0, 32);
     addCircleVertices('rocket-silo', 4.0, 0, 0, 48)
+
+    addCircleVertices('fluid-wagon', 0.8, 0, -2);
+    addCircleVertices('fluid-wagon', 0.8, 0, 0);
+    addCircleVertices('fluid-wagon', 0.8, 0, 2);
 
     addRadiationSymbolVertices('nuclear-reactor', 1.6);
 };

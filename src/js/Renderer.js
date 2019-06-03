@@ -122,10 +122,11 @@ export default class Renderer {
         for (const entity of entities) {
             const n = entity.name;
             const d = entity.direction || 0;
+            const o = entity.orientation ? 4*entity.orientation : null;
 
             const conn = this._connectionSolver.getConnectionFlags(entity);
             const option = (d&1) === 1;
-            const rotationFactor = d>>1;
+            const rotationFactor = (o!==null) ? o : d>>1;
 
             let flipHorizontal = false;
             let rotation = 0.5 * Math.PI * rotationFactor;
