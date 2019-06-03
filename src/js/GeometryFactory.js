@@ -9,6 +9,53 @@ import {
     RecipesHaveNoFluidOutput
 } from './Blueprint'
 
+import {
+    ConnectionEquivalentDict
+} from './ConnectionSolver'
+
+const drawingEquivalentDict = {
+    "wooden-chest": "chest",
+    "iron-chest": "chest",
+    "steel-chest": "chest",
+    "logistic-chest-active-provider": "chest",
+    "logistic-chest-passive-provider": "chest",
+    "logistic-chest-requester": "chest",
+    "logistic-chest-storage": "chest",
+    "logistic-chest-buffer": "chest",
+    "medium-electric-pole": "small-electric-pole",
+    "substation": "big-electric-pole",
+    "fast-transport-belt": "transport-belt",
+    "express-transport-belt": "transport-belt",
+    "fast-underground-belt": "underground-belt",
+    "express-underground-belt": "underground-belt",
+    "fast-splitter": "splitter",
+    "express-splitter": "splitter",
+    "burner-inserter": "inserter",
+    "fast-inserter": "inserter",
+    "filter-inserter": "inserter",
+    "stack-inserter": "inserter",
+    "stack-filter-inserter": "inserter",
+    "rail-chain-signal": "rail-signal",
+    "steam-turbine": "steam-engine",
+    "heat-exchanger": "boiler",
+    "assembling-machine-1": "assembling-machine",
+    "assembling-machine-2": "assembling-machine",
+    "assembling-machine-3": "assembling-machine",
+    "decider-combinator": "rect1x2",
+    "arithmetic-combinator": "rect1x2",
+    "burner-mining-drill": "rect2x2",
+    "steel-furnace": "rect2x2",
+    "stone-furnace": "rect2x2",
+    "train-stop": "rect2x2",
+    "accumulator": "rect2x2",
+    "centrifuge": "rect3x3",
+    "electric-mining-drill": "rect3x3",
+    "lab": "rect3x3",
+    "radar": "rect3x3",
+    "solar-panel": "rect3x3",
+    "roboport": "rect4x4"
+};
+
 const VERTICES = {
     "default": {
         "positions": [
@@ -875,7 +922,7 @@ const generateStraightRail = (margin, segments=6) => {
 const generateStraightRailDiag = (margin) => {
     const d = (1.0-margin)*Math.sqrt(2);
 
-    const positions = [d, -1,-1, d, -d, -1, -1, -d, d/2, d/2-1, (d-1)/2, (d-1)/2, d/2-1, d/2, (-d-1)/2, (-d-1)/2, 0, -1, -1, 0];
+    const positions = [-d, -1, 1, d, d, -1, 1, -d, -d/2, d/2-1, -(d-1)/2, (d-1)/2, -d/2+1, d/2, (d+1)/2, (-d-1)/2, 0, -1, 1, 0];
     const indices = [0, 1, 2, 3, 4, 8, 5, 7, 6, 9];
 
     VERTICES['straight-rail-diag'] = { positions, indices };
@@ -888,61 +935,6 @@ const generateRailVertices = (margin, segments) => {
 };
 
 const init = () => {
-    const equivalentDict = {
-        "wooden-chest": "chest",
-        "iron-chest": "chest",
-        "steel-chest": "chest",
-        "logistic-chest-active-provider": "chest",
-        "logistic-chest-passive-provider": "chest",
-        "logistic-chest-requester": "chest",
-        "logistic-chest-storage": "chest",
-        "logistic-chest-buffer": "chest",
-        "medium-electric-pole": "small-electric-pole",
-        "substation": "big-electric-pole",
-        "fast-transport-belt": "transport-belt",
-        "fast-transport-belt-turn-left": "transport-belt-turn-left",
-        "fast-transport-belt-turn-right": "transport-belt-turn-right",
-        "express-transport-belt": "transport-belt",
-        "express-transport-belt-turn-left": "transport-belt-turn-left",
-        "express-transport-belt-turn-right": "transport-belt-turn-right",
-        "fast-underground-belt-input": "underground-belt-input",
-        "fast-underground-belt-output": "underground-belt-output",
-        "express-underground-belt-input": "underground-belt-input",
-        "express-underground-belt-output": "underground-belt-output",
-        "fast-splitter": "splitter",
-        "express-splitter": "splitter",
-        "burner-inserter": "inserter",
-        "fast-inserter": "inserter",
-        "filter-inserter": "inserter",
-        "stack-inserter": "inserter",
-        "stack-filter-inserter": "inserter",
-        "rail-chain-signal": "rail-signal",
-        "steam-turbine": "steam-engine",
-        "heat-exchanger": "boiler",
-        "assembling-machine-1": "assembling-machine",
-        "assembling-machine-2": "assembling-machine",
-        "assembling-machine-3": "assembling-machine",
-        "assembling-machine-2-fluid-input": "assembling-machine-fluid-input",
-        "assembling-machine-3-fluid-input": "assembling-machine-fluid-input",
-        "decider-combinator": "rect1x2",
-        "arithmetic-combinator": "rect1x2",
-        "burner-mining-drill": "rect2x2",
-        "steel-furnace": "rect2x2",
-        "stone-furnace": "rect2x2",
-        "train-stop": "rect2x2",
-        "accumulator": "rect2x2",
-        "centrifuge": "rect3x3",
-        "electric-mining-drill": "rect3x3",
-        "lab": "rect3x3",
-        "radar": "rect3x3",
-        "solar-panel": "rect3x3",
-        "roboport": "rect4x4"
-    };
-
-    for (const key in equivalentDict) {
-        VERTICES[key] = VERTICES[equivalentDict[key]];
-    }
-
     inflatePipeVertices('pipe');
 
     inflatePipeVertices('heat-pipe');
@@ -963,19 +955,18 @@ export class GeometryFactory {
         this._cache = {};
     }
 
-    create(entity, useCache = true) {
+    create(entity, connectionFlags, useCache = true) {
         const type = entity.type;
         const dirc = entity.direction || 0;
-
-        let key = entity.name;
+        const connectionKey = ConnectionEquivalentDict[entity.name] || entity.name;
+        let conn = connectionFlags;
+        let key = drawingEquivalentDict[entity.name] || entity.name;
 
         if (type !== undefined) {
             key += `-${type}`;
         }
 
-        if (entity.category === 'transport-belt') {
-            const conn = entity.connection_flags_belt;
-
+        if (connectionKey === 'transport-belt') {
             if (conn !== undefined) {
                 const relDircD = (dirc + Direction.UP   ) % 8;
                 const relDircL = (dirc + Direction.RIGHT) % 8;
@@ -991,37 +982,41 @@ export class GeometryFactory {
                 }
             }
         }
-        else if (entity.category === 'pipe' || entity.category === 'heat-pipe') {
-            const conn = (entity.category === 'pipe') ? entity.connection_flags_pipe : entity.connection_flags_heat;
+        else if (connectionKey === 'pipe' || connectionKey === 'heat-pipe') {
+            // if the pipe has less than two connections, add missing ones,
+            // because there is no dead-end pipe.
+            if     (!conn)        conn = 70; // horizontal straight pipe.
+            else if (conn ===  1) conn = 17; // vertical straight pipe.
+            else if (conn === 16) conn = 17;
+            else if (conn ===  4) conn = 70;
+            else if (conn === 64) conn = 70;
 
-            if (conn !== undefined) {
-                const isConnD = ((conn>>Direction.UP   ) & 1) === 1;
-                const isConnL = ((conn>>Direction.RIGHT) & 1) === 1;
-                const isConnU = ((conn>>Direction.DOWN ) & 1) === 1;
-                const isConnR = ((conn>>Direction.LEFT ) & 1) === 1;
+            const isConnD = ((conn>>Direction.UP   ) & 1) === 1;
+            const isConnL = ((conn>>Direction.RIGHT) & 1) === 1;
+            const isConnU = ((conn>>Direction.DOWN ) & 1) === 1;
+            const isConnR = ((conn>>Direction.LEFT ) & 1) === 1;
 
-                // suffix characters must be put in this order.
-                let suffix = '-';
-                if (isConnU) suffix += 'u';
-                if (isConnR) suffix += 'r';
-                if (isConnD) suffix += 'd';
-                if (isConnL) suffix += 'l';
+            // suffix characters must be put in this order.
+            let suffix = '-';
+            if (isConnU) suffix += 'u';
+            if (isConnR) suffix += 'r';
+            if (isConnD) suffix += 'd';
+            if (isConnL) suffix += 'l';
 
-                key += suffix;
-            }
+            key += suffix;
         }
-        else if (entity.category === 'assembling-machine') {
+        else if (connectionKey === 'assembling-machine') {
             if (RecipesHaveFluidInput.includes(entity.recipe)) {
                 key += '-fluid-input';
             }
         }
-        else if (entity.category === 'chemical-plant') {
+        else if (connectionKey === 'chemical-plant') {
             if (RecipesHaveNoFluidOutput.includes(entity.recipe)) {
                 key += '-no-output';
             }
         }
 
-        if (entity.name === 'straight-rail') {
+        if (key === 'straight-rail') {
             if ((dirc & 1) === 1) {
                 key += '-diag';
             }
