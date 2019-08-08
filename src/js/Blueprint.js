@@ -21,7 +21,8 @@ export const RecipesHaveFluidInput = [
     'express-underground-belt',
     'express-splitter',
     'processing-unit',
-    'electric-engine-unit'
+    'electric-engine-unit',
+    'rocket-fuel'
 ];
 
 export class BlueprintLoader {
