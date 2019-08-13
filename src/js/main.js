@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const blueprintSelector = new BlueprintSelector((selectedId) => {
         const id = parseInt(selectedId, 10);
         const blueprint = currentBook['blueprints'].find((elem) => elem['index'] === id)['blueprint'];
-        renderer.setBlueprint(blueprint);
+        renderer.setBlueprint(blueprint, document.querySelector('#check-show-icons').checked);
     }, document.querySelector('#select-blueprint'));
 
     const renderer = new Renderer();
@@ -68,6 +68,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (result !== null) {
             loadBlueprintString(result);
         }
+    });
+
+    document.querySelector('#check-show-icons').addEventListener('change', (e) => {
+        renderer.setIconsVisible(e.target.checked);
     });
 
     document.addEventListener('dragenter', (e) => { e.preventDefault(); });

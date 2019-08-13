@@ -95,6 +95,8 @@ export default class Renderer {
         this._grid = new Grid();
         this._scene.add(this._grid);
 
+        this._iconGroup = null;
+
         this._controls = new MapControls(this._camera, this._renderer.domElement);
         this._controls.zoomSpeed = 2.0;
         this._controls.minZoom = 0.5;
@@ -113,14 +115,14 @@ export default class Renderer {
 
     get domElement() { return this._renderer.domElement; }
 
-    _createEntities(entities) {
-        const ret = new THREE.Group();
-        ret.scale.y = -1.0;
+    _createEntities(entities, iconsVisible) {
+        const root = new THREE.Group();
+        root.scale.y = -1.0;
 
         const entitiyGroup = new THREE.Group();
         const iconGroup = new THREE.Group();
-        ret.add(entitiyGroup);
-        ret.add(iconGroup);
+        root.add(entitiyGroup);
+        root.add(iconGroup);
 
         this._connectionSolver.init(entities);
 
@@ -158,7 +160,9 @@ export default class Renderer {
             }
         }
 
-        return ret;
+        iconGroup.visible = iconsVisible;
+
+        return { root, iconGroup };
     }
 
     _adjustFrame(content, margin=4) {
@@ -174,7 +178,7 @@ export default class Renderer {
         this._grid.update(size.x, size.y);
     }
 
-    setBlueprint(blueprint) {
+    setBlueprint(blueprint, iconsVisible = false) {
         const b = this._blueprintBody;
 
         while (b.children.length > 0) {
@@ -185,11 +189,19 @@ export default class Renderer {
             return;
         }
 
-        const entityRoot = this._createEntities(blueprint.entities);
+        const { root, iconGroup } = this._createEntities(blueprint.entities, iconsVisible);
 
-        b.add(entityRoot);
+        b.add(root);
+
+        this._iconGroup = iconGroup;
 
         this._adjustFrame(b);
+    }
+
+    setIconsVisible(visible) {
+        if (this._iconGroup) {
+            this._iconGroup.visible = visible;
+        }
     }
 
     setSize(width, height) {
