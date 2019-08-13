@@ -117,6 +117,11 @@ export default class Renderer {
         const ret = new THREE.Group();
         ret.scale.y = -1.0;
 
+        const entitiyGroup = new THREE.Group();
+        const iconGroup = new THREE.Group();
+        ret.add(entitiyGroup);
+        ret.add(iconGroup);
+
         this._connectionSolver.init(entities);
 
         for (const entity of entities) {
@@ -143,8 +148,14 @@ export default class Renderer {
             obj.position.set(entity.position.x, entity.position.y, 0);
             obj.scale.x = flipHorizontal ? -1.0 : 1.0;
             obj.rotation.z = rotation;
+            entitiyGroup.add(obj);
 
-            ret.add(obj);
+            const iconGeometry = this._geometryFactory.createIcon(entity, conn);
+            if (iconGeometry !== null) {
+                const icon = new THREE.LineSegments(iconGeometry, this._commonMaterial);
+                icon.position.set(entity.position.x, entity.position.y, 0);
+                iconGroup.add(icon);
+            }
         }
 
         return ret;

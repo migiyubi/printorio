@@ -13,7 +13,7 @@ import {
     ConnectionEquivalentDict
 } from './ConnectionSolver'
 
-const drawingEquivalentDict = {
+const DrawingEquivalentDict = {
     "wooden-chest": "chest",
     "iron-chest": "chest",
     "steel-chest": "chest",
@@ -50,10 +50,22 @@ const drawingEquivalentDict = {
     "accumulator": "rect2x2",
     "centrifuge": "rect3x3",
     "electric-mining-drill": "rect3x3",
-    "lab": "rect3x3",
     "radar": "rect3x3",
     "solar-panel": "rect3x3",
     "roboport": "rect4x4"
+};
+
+const IconKeyDict = {
+    "assembling-machine": "icon-gear-wheel",
+    "assembling-machine-fluid-input": "icon-gear-wheel",
+    "electric-furnace": "icon-resistance",
+    "chemical-plant": "icon-droplet",
+    "chemical-plant-no-output": "icon-droplet",
+    "oil-refinery": "icon-droplet",
+    "nuclear-reactor": "icon-radiation-symbol",
+    "lab": "icon-flask",
+    "small-electric-pole": "icon-thunder",
+    "big-electric-pole": "icon-thunder"
 };
 
 const VERTICES = {
@@ -80,32 +92,18 @@ const VERTICES = {
             -0.40,  0.40,
             -0.40, -0.40,
              0.40, -0.40,
-             0.40,  0.40,
-
-             0.10, -0.30,
-            -0.20,  0.05,
-             0.00,  0.05,
-            -0.10,  0.30,
-             0.20, -0.05,
-             0.00, -0.05
+             0.40,  0.40
         ],
-        "indices": [0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 4]
+        "indices": [0, 1, 1, 2, 2, 3, 3, 0]
     },
     "big-electric-pole": {
         "positions": [
             -0.90,  0.90,
             -0.90, -0.90,
              0.90, -0.90,
-             0.90,  0.90,
-
-             0.10, -0.30,
-            -0.20,  0.05,
-             0.00,  0.05,
-            -0.10,  0.30,
-             0.20, -0.05,
-             0.00, -0.05
+             0.90,  0.90
         ],
-        "indices": [0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 4]
+        "indices": [0, 1, 1, 2, 2, 3, 3, 0]
     },
     "transport-belt": {
         "positions": [
@@ -456,6 +454,23 @@ const VERTICES = {
             -1.40,  1.40,
             -1.40, -1.40,
              1.40, -1.40,
+             1.40,  1.40,
+            -0.70, -1.40,
+            -1.40, -0.70,
+            -1.40,  0.70,
+            -0.70,  1.40,
+             0.70,  1.40,
+             1.40,  0.70,
+             1.40, -0.70,
+             0.70, -1.40
+        ],
+        "indices": [0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 6, 7, 8, 9, 10, 11]
+    },
+    "lab": {
+        "positions": [
+            -1.40,  1.40,
+            -1.40, -1.40,
+             1.40, -1.40,
              1.40,  1.40
         ],
         "indices": [0, 1, 1, 2, 2, 3, 3, 0]
@@ -710,6 +725,30 @@ const VERTICES = {
              1.90,  1.90
         ],
         "indices": [0, 1, 1, 2, 2, 3, 3, 0]
+    },
+    "icon-flask": {
+        "positions": [
+            -0.12, -0.70,
+            -0.12, -0.10,
+            -0.60,  0.55,
+            -0.50,  0.70,
+             0.50,  0.70,
+             0.60,  0.55,
+             0.12, -0.10,
+             0.12, -0.70
+        ],
+        "indices": [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 0]
+    },
+    "icon-thunder": {
+        "positions": [
+             0.10, -0.30,
+            -0.20,  0.05,
+             0.00,  0.05,
+            -0.10,  0.30,
+             0.20, -0.05,
+             0.00, -0.05
+        ],
+        "indices": [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 0]
     }
 }
 
@@ -742,51 +781,6 @@ const inflatePipeVertices = (prefix='pipe') => {
     VERTICES[`${prefix}-url`] = rotate90cw(VERTICES[`${prefix}-udl`]);
 };
 
-const addRadiationSymbolVertices = (key, size=1.0, x=0, y=0) => {
-    const v = VERTICES[key];
-
-    const bladeInnerSegments = 8;
-    const bladeOuterSegments = 16;
-
-    const positions = [];
-    const indices = [];
-
-    addCircleVertices(key, 0.1*size, x, y, 16);
-
-    const r = 0.15*size;
-    const R = 0.5 * size;
-    const blades = 3;
-    const segments = bladeInnerSegments+1 + bladeOuterSegments+1;
-
-    for (let i = 0; i < blades; i++) {
-        const t0 = 2 * Math.PI * i / blades + Math.PI/3;
-
-        for (let j = 0; j <= bladeInnerSegments; j++) {
-            const t = t0 + Math.PI/3 * j / bladeInnerSegments;
-
-            positions.push(x + r * Math.cos(t));
-            positions.push(y + r * Math.sin(t));
-        }
-
-        for (let j = bladeOuterSegments; j >= 0; j--) {
-            const t = t0 + Math.PI/3 * j / bladeOuterSegments;
-
-            positions.push(x + R * Math.cos(t));
-            positions.push(y + R * Math.sin(t));
-        }
-
-        const i0 = v.positions.length/2 + i*segments;
-
-        for (let j = 0; j < segments; j++) {
-            indices.push(i0 + j);
-            indices.push(i0 + (j+1)%segments);
-        }
-    }
-
-    v.positions = v.positions.concat(positions);
-    v.indices = v.indices.concat(indices);
-};
-
 const addCircleVertices = (key, r=0.5, x=0, y=0, segments=16) => {
     const v = VERTICES[key];
 
@@ -808,49 +802,6 @@ const addCircleVertices = (key, r=0.5, x=0, y=0, segments=16) => {
     v.positions = v.positions.concat(positions);
     v.indices = v.indices.concat(indices);
 }
-
-const addGearVertices = (key, size=1.0, x=0, y=0) => {
-    const v = VERTICES[key];
-
-    addCircleVertices(key, 0.15*size, x, y);
-
-    const tooth = 8;
-    const R = 0.5*size;
-    const r = 0.4*size;
-    const T = 0.15;
-    const t = 0.2;
-
-    const i0 = v.positions.length/2;
-    const segments = 4*tooth;
-
-    const positions = [];
-    const indices = [];
-
-    for (let i = 0; i < tooth; i++) {
-        const t0 = 2*Math.PI * i / tooth;
-
-        positions.push(x + r * Math.cos(t0-t));
-        positions.push(y + r * Math.sin(t0-t));
-        positions.push(x + R * Math.cos(t0-T));
-        positions.push(y + R * Math.sin(t0-T));
-        positions.push(x + R * Math.cos(t0+T));
-        positions.push(y + R * Math.sin(t0+T));
-        positions.push(x + r * Math.cos(t0+t));
-        positions.push(y + r * Math.sin(t0+t));
-
-        indices.push(i0 + 4*i);
-        indices.push(i0 + 4*i+1);
-        indices.push(i0 + 4*i+1);
-        indices.push(i0 + 4*i+2);
-        indices.push(i0 + 4*i+2);
-        indices.push(i0 + 4*i+3);
-        indices.push(i0 + 4*i+3);
-        indices.push(i0 + (4*i+4)%segments);
-    }
-
-    v.positions = v.positions.concat(positions);
-    v.indices = v.indices.concat(indices);
-};
 
 const generateCurvedRail = (margin, segments) => {
     // calculate the arc whose central angle is (almost) 45 degs.
@@ -962,6 +913,146 @@ const generateRailVertices = (margin, segments) => {
     generateStraightRailDiag(margin);
 };
 
+const generateIconGearWheelVertices = (size=1.5, x=0.0, y=0.0) => {
+    const tooth = 8;
+    const R = 0.5*size;
+    const r = 0.4*size;
+    const T = 0.15;
+    const t = 0.2;
+
+    const segments = 4*tooth;
+
+    const positions = [];
+    const indices = [];
+
+    for (let i = 0; i < tooth; i++) {
+        const t0 = 2*Math.PI * i / tooth;
+
+        positions.push(x + r * Math.cos(t0-t));
+        positions.push(y + r * Math.sin(t0-t));
+        positions.push(x + R * Math.cos(t0-T));
+        positions.push(y + R * Math.sin(t0-T));
+        positions.push(x + R * Math.cos(t0+T));
+        positions.push(y + R * Math.sin(t0+T));
+        positions.push(x + r * Math.cos(t0+t));
+        positions.push(y + r * Math.sin(t0+t));
+
+        indices.push(4*i);
+        indices.push(4*i+1);
+        indices.push(4*i+1);
+        indices.push(4*i+2);
+        indices.push(4*i+2);
+        indices.push(4*i+3);
+        indices.push(4*i+3);
+        indices.push((4*i+4)%segments);
+    }
+
+    VERTICES['icon-gear-wheel'] = { positions, indices };
+
+    addCircleVertices('icon-gear-wheel', 0.15*size, x, y);
+};
+
+const generateIconResistanceVertices = (size=1.5, x=0.0, y=0.0) => {
+    const dx = 0.125*size;
+    const dy = 0.3*size;
+    const ox = -0.5*size
+
+    const positions = [];
+    const indices = [];
+
+    for (let i = 0; i < 3; i++) {
+        positions.push(x + ox + 3*i*dx);
+        positions.push(y - dy);
+        positions.push(x + ox + 3*i*dx);
+        positions.push(y + dy);
+        positions.push(x + ox + (3*i+2)*dx);
+        positions.push(y + dy);
+        positions.push(x + ox + (3*i+2)*dx);
+        positions.push(y - dy);
+
+        if (i > 0) {
+            indices.push(4*i-1);
+            indices.push(4*i);
+        }
+        indices.push(4*i);
+        indices.push(4*i+1);
+        indices.push(4*i+1);
+        indices.push(4*i+2);
+        indices.push(4*i+2);
+        indices.push(4*i+3);
+    }
+
+    VERTICES['icon-resistance'] = { positions, indices };
+};
+
+const generateIconDropletVertices = (size=1.6, x=0.0, y=0.0) => {
+    const r = 0.2*size;
+    const oy = 0.1*size;
+
+    const positions = [];
+    const indices = [];
+
+    positions.push(x);
+    positions.push(y - 0.5*size + oy);
+
+    for (let i = 0; i < 11; i++) {
+        const t = 1.25 * Math.PI * i / 10 + 1.875*Math.PI;
+
+        positions.push(x + r*Math.cos(t));
+        positions.push(y + r*Math.sin(t) + oy);
+
+        indices.push(i);
+        indices.push(i+1);
+    }
+
+    indices.push(11);
+    indices.push(0);
+
+    VERTICES['icon-droplet'] = { positions, indices };
+};
+
+const generateIconRadiationSymbolVertices = (size=1.6, x=0.0, y=0.0) => {
+    const bladeInnerSegments = 8;
+    const bladeOuterSegments = 16;
+
+    const positions = [];
+    const indices = [];
+
+    const r = 0.15*size;
+    const R = 0.5 * size;
+    const blades = 3;
+    const segments = bladeInnerSegments+1 + bladeOuterSegments+1;
+
+    for (let i = 0; i < blades; i++) {
+        const t0 = 2 * Math.PI * i / blades + Math.PI/3;
+
+        for (let j = 0; j <= bladeInnerSegments; j++) {
+            const t = t0 + Math.PI/3 * j / bladeInnerSegments;
+
+            positions.push(x + r * Math.cos(t));
+            positions.push(y + r * Math.sin(t));
+        }
+
+        for (let j = bladeOuterSegments; j >= 0; j--) {
+            const t = t0 + Math.PI/3 * j / bladeOuterSegments;
+
+            positions.push(x + R * Math.cos(t));
+            positions.push(y + R * Math.sin(t));
+        }
+
+        const i0 = i*segments;
+
+        for (let j = 0; j < segments; j++) {
+            indices.push(i0 + j);
+            indices.push(i0 + (j+1)%segments);
+        }
+    }
+
+    VERTICES['icon-radiation-symbol'] = { positions, indices };
+
+    addCircleVertices('icon-radiation-symbol', 0.1*size, x, y, 16);
+};
+
 const init = () => {
     inflatePipeVertices('pipe');
 
@@ -977,7 +1068,10 @@ const init = () => {
     addCircleVertices('fluid-wagon', 0.8, 0, 0);
     addCircleVertices('fluid-wagon', 0.8, 0, 2);
 
-    addRadiationSymbolVertices('nuclear-reactor', 1.6);
+    generateIconGearWheelVertices();
+    generateIconResistanceVertices();
+    generateIconDropletVertices();
+    generateIconRadiationSymbolVertices();
 };
 
 init();
@@ -988,18 +1082,70 @@ export class GeometryFactory {
     }
 
     create(entity, connectionFlags, useCache = true) {
-        const type = entity.type;
+        const key = this._resolveKey(entity, connectionFlags);
+
+        return this._createInternal(key, useCache);
+    }
+
+    createIcon(entity, connectionFlags, useCache = true) {
+        const entityKey = this._resolveKey(entity, connectionFlags);
+        const iconKey = IconKeyDict[entityKey];
+
+        if (!iconKey) {
+            return null;
+        }
+
+        return this._createInternal(iconKey, useCache);
+    }
+
+    _createInternal(key, useCache) {
+        if (useCache) {
+            const cache = this._cache[key];
+
+            if (cache !== undefined) {
+                return cache;  
+            }
+        }
+
+        let src = VERTICES[key];
+        if (src === undefined) {
+            console.warn(`${key} is not defined.`);
+
+            src = VERTICES['default'];
+        }
+
+        const len = src.positions.length / 2;
+        const positions = [];
+        for (let i = 0; i < len; i++) {
+            positions[3*i  ] = src.positions[2*i  ];
+            positions[3*i+1] = src.positions[2*i+1];
+            positions[3*i+2] = 0;
+        }
+
+        const geometry = new BufferGeometry();
+        geometry.addAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+        geometry.setIndex(new BufferAttribute(new Uint16Array(src.indices), 1));
+
+        if (useCache) {
+            this._cache[key] = geometry;
+        }
+
+        return geometry;
+    }
+
+    _resolveKey(entity, connectionFlags) {
+        let key = DrawingEquivalentDict[entity.name] || entity.name;
+
+        if (entity.type !== undefined) {
+            key += `-${entity.type}`;
+        }
+
         const dirc = entity.direction || 0;
         const connectionKey = ConnectionEquivalentDict[entity.name] || entity.name;
         let conn = connectionFlags;
-        let key = drawingEquivalentDict[entity.name] || entity.name;
-
-        if (type !== undefined) {
-            key += `-${type}`;
-        }
 
         if (connectionKey === 'transport-belt') {
-            if (conn !== undefined) {
+            if (!!conn) {
                 const relDircD = (dirc + Direction.UP   ) % 8;
                 const relDircL = (dirc + Direction.RIGHT) % 8;
                 const relDircU = (dirc + Direction.DOWN ) % 8;
@@ -1054,37 +1200,6 @@ export class GeometryFactory {
             }
         }
 
-        if (useCache) {
-            const cache = this._cache[key];
-
-            if (cache !== undefined) {
-                return cache;  
-            }
-        }
-
-        let src = VERTICES[key];
-        if (src === undefined) {
-            console.warn(`${key} is not defined.`);
-
-            src = VERTICES['default'];
-        }
-
-        const len = src.positions.length / 2;
-        const positions = [];
-        for (let i = 0; i < len; i++) {
-            positions[3*i  ] = src.positions[2*i  ];
-            positions[3*i+1] = src.positions[2*i+1];
-            positions[3*i+2] = 0;
-        }
-
-        const geometry = new BufferGeometry();
-        geometry.addAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
-        geometry.setIndex(new BufferAttribute(new Uint16Array(src.indices), 1));
-
-        if (useCache) {
-            this._cache[key] = geometry;
-        }
-
-        return geometry;
+        return key;
     }
 }
