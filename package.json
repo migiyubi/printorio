@@ -10,6 +10,7 @@
   "author": "migiyubi",
   "license": "MIT",
   "devDependencies": {
+    "copy-webpack-plugin": "^5.0.4",
     "css-loader": "^2.1.0",
     "file-loader": "^3.0.1",
     "html-loader": "^0.5.5",

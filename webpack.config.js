@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const src = path.resolve(__dirname, 'src')
 const dist = path.resolve(__dirname, 'dist')
@@ -33,10 +33,11 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './html/index.html',
-      inject: 'head',
-      inlineSource: '.js$'
+      inject: 'head'
     }),
-    new HtmlWebpackInlineSourcePlugin()
+    new CopyPlugin([
+      { from: src + '/assets', to: dist + '/assets' }
+    ])
   ],
   mode: 'production'
 };
