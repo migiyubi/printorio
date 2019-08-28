@@ -1,9 +1,4 @@
 import * as THREE from 'three'
-import {
-    Direction,
-    RecipesHaveFluidInput,
-    RecipesHaveNoFluidOutput
-} from './Blueprint'
 import { ConnectionSolver } from './ConnectionSolver'
 import { GeometryFactory } from './GeometryFactory'
 import { MapControls } from './MapControls'

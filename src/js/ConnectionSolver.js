@@ -28,9 +28,18 @@ export class ConnectionSolver {
     }
 
     // OPTIMIZE: inlining?
-    _setFlag(map, x, y, direction) {
+    _setFlag(map, x, y, entityDirection, dx, dy, connectionDirectionOffset) {
+        switch (entityDirection) {
+            case Direction.UP:    x += dx; y += dy; break;
+            case Direction.RIGHT: x -= dy; y += dx; break;
+            case Direction.DOWN:  x -= dx; y -= dy; break;
+            case Direction.LEFT:  x += dy; y -= dx; break;
+            default: break;
+        }
+
+        const connDirc = (entityDirection + connectionDirectionOffset) % 8;
         const key = this._toUniqueKey(x, y);
-        const flag = 1<<direction;
+        const flag = 1<<connDirc;
         map[key] = (map[key] === undefined) ? flag : (map[key] | flag);
     }
 
@@ -50,23 +59,11 @@ export class ConnectionSolver {
             const c = ConnectionEquivalentDict[entity.name] || entity.name;
 
             if (c === 'transport-belt') {
-                switch (d) {
-                    case Direction.UP:    this._setFlag(belt, x, y-1, d); break;
-                    case Direction.RIGHT: this._setFlag(belt, x+1, y, d); break;
-                    case Direction.DOWN:  this._setFlag(belt, x, y+1, d); break;
-                    case Direction.LEFT:  this._setFlag(belt, x-1, y, d); break;
-                    default: break;
-                }
+                this._setFlag(belt, x, y, d, 0, -1, 0);
             }
             else if (c === 'underground-belt') {
                 if (t === 'output') {
-                    switch (d) {
-                        case Direction.UP:    this._setFlag(belt, x, y-1, d); break;
-                        case Direction.RIGHT: this._setFlag(belt, x+1, y, d); break;
-                        case Direction.DOWN:  this._setFlag(belt, x, y+1, d); break;
-                        case Direction.LEFT:  this._setFlag(belt, x-1, y, d); break;
-                        default: break;
-                    }
+                    this._setFlag(belt, x, y, d, 0, -1, 0);
                 }
                 else {
                     // TODO: check also input connections so that we can find terminal belts.
@@ -74,206 +71,89 @@ export class ConnectionSolver {
                 }
             }
             else if (c === 'splitter') {
-                switch (d) {
-                    case Direction.UP:    this._setFlag(belt, x-0.5, y-1, d); this._setFlag(belt, x+0.5, y-1, d); break;
-                    case Direction.RIGHT: this._setFlag(belt, x+1, y-0.5, d); this._setFlag(belt, x+1, y+0.5, d); break;
-                    case Direction.DOWN:  this._setFlag(belt, x-0.5, y+1, d); this._setFlag(belt, x+0.5, y+1, d); break;
-                    case Direction.LEFT:  this._setFlag(belt, x-1, y-0.5, d); this._setFlag(belt, x-1, y+0.5, d); break;
-                    default: break;
-                }
+                this._setFlag(belt, x, y, d, -0.5, -1, 0);
+                this._setFlag(belt, x, y, d,  0.5, -1, 0);
 
                 // TODO: check also input connections so that we can find terminal belts.
 
             }
             else if (c === 'pipe') {
-                this._setFlag(pipe, x, y-1, Direction.UP);
-                this._setFlag(pipe, x+1, y, Direction.RIGHT);
-                this._setFlag(pipe, x, y+1, Direction.DOWN);
-                this._setFlag(pipe, x-1, y, Direction.LEFT);
+                this._setFlag(pipe, x, y, d,  0, -1, 0);
+                this._setFlag(pipe, x, y, d,  1,  0, 2);
+                this._setFlag(pipe, x, y, d,  0,  1, 4);
+                this._setFlag(pipe, x, y, d, -1,  0, 6);
             }
             else if (c === 'pipe-to-ground') {
-                switch (d) {
-                    case Direction.UP:    this._setFlag(pipe, x, y-1, d); break;
-                    case Direction.RIGHT: this._setFlag(pipe, x+1, y, d); break;
-                    case Direction.DOWN:  this._setFlag(pipe, x, y+1, d); break;
-                    case Direction.LEFT:  this._setFlag(pipe, x-1, y, d); break;
-                    default: break;
-                }
+                this._setFlag(pipe, x, y, d,  0, -1, 0);
             }
             else if (c === 'pump') {
-                let key0, key1;
-                switch (d) {
-                    case Direction.UP:    this._setFlag(pipe, x, y-1.5, Direction.UP);    this._setFlag(pipe, x, y+1.5, Direction.DOWN);  break;
-                    case Direction.RIGHT: this._setFlag(pipe, x+1.5, y, Direction.RIGHT); this._setFlag(pipe, x-1.5, y, Direction.LEFT);  break;
-                    case Direction.DOWN:  this._setFlag(pipe, x, y+1.5, Direction.DOWN);  this._setFlag(pipe, x, y-1.5, Direction.UP);    break;
-                    case Direction.LEFT:  this._setFlag(pipe, x-1.5, y, Direction.LEFT);  this._setFlag(pipe, x+1.5, y, Direction.RIGHT); break;
-                    default: break;
-                }
+                this._setFlag(pipe, x, y, d,  0, -1.5, 0);
+                this._setFlag(pipe, x, y, d,  0,  1.5, 4);
             }
             else if (c === 'offshore-pump') {
-                switch (d) {
-                    case Direction.UP:    this._setFlag(pipe, x, y+1, Direction.DOWN);  break;
-                    case Direction.RIGHT: this._setFlag(pipe, x-1, y, Direction.LEFT);  break;
-                    case Direction.DOWN:  this._setFlag(pipe, x, y-1, Direction.UP);    break;
-                    case Direction.LEFT:  this._setFlag(pipe, x+1, y, Direction.RIGHT); break;
-                    default: break;
-                }
+                this._setFlag(pipe, x, y, d, 0, 1, 4);
             }
             else if (c === 'storage-tank') {
-                switch (d) {
-                    case Direction.UP:
-                        this._setFlag(pipe, x-1, y-2, Direction.UP); 
-                        this._setFlag(pipe, x+2, y+1, Direction.RIGHT);
-                        this._setFlag(pipe, x+1, y+2, Direction.DOWN);
-                        this._setFlag(pipe, x-2, y-1, Direction.LEFT);
-                        break;
-                    case Direction.RIGHT:
-                        this._setFlag(pipe, x+1, y-2, Direction.UP); 
-                        this._setFlag(pipe, x+2, y-1, Direction.RIGHT);
-                        this._setFlag(pipe, x-1, y+2, Direction.DOWN);
-                        this._setFlag(pipe, x-2, y+1, Direction.LEFT);
-                        break;
-                    default:
-                        break;
-                }
+                this._setFlag(pipe, x, y, d, -1, -2, 0);
+                this._setFlag(pipe, x, y, d,  2,  1, 2);
+                this._setFlag(pipe, x, y, d,  1,  2, 4);
+                this._setFlag(pipe, x, y, d, -2, -1, 6);
             }
             else if (c === 'assembling-machine') {
                 if (RecipesHaveFluidInput.includes(entity.recipe)) {
-                    switch (d) {
-                        case Direction.UP:    this._setFlag(pipe, x, y-2, d); break;
-                        case Direction.RIGHT: this._setFlag(pipe, x+2, y, d); break;
-                        case Direction.DOWN:  this._setFlag(pipe, x, y+2, d); break;
-                        case Direction.LEFT:  this._setFlag(pipe, x-2, y, d); break;
-                        default: break;
-                    }
+                    this._setFlag(pipe, x, y, d, 0, -2, 0);
                 }
             }
             else if (c === 'chemical-plant') {
                 // inputs.
-                switch (d) {
-                    case Direction.UP:    this._setFlag(pipe, x-1, y-2, d); this._setFlag(pipe, x+1, y-2, d); break;
-                    case Direction.RIGHT: this._setFlag(pipe, x+2, y-1, d); this._setFlag(pipe, x+2, y+1, d); break;
-                    case Direction.DOWN:  this._setFlag(pipe, x-1, y+2, d); this._setFlag(pipe, x+1, y+2, d); break;
-                    case Direction.LEFT:  this._setFlag(pipe, x-2, y-1, d); this._setFlag(pipe, x-2, y+1, d); break;
-                    default: break;
-                }
+                this._setFlag(pipe, x, y, d, -1, -2, 0);
+                this._setFlag(pipe, x, y, d,  1, -2, 0);
 
                 // outputs.
                 if (!RecipesHaveNoFluidOutput.includes(entity.recipe)) {
-                    switch (d) {
-                        case Direction.UP:    this._setFlag(pipe, x-1, y+2, Direction.DOWN);  this._setFlag(pipe, x+1, y+2, Direction.DOWN);  break;
-                        case Direction.RIGHT: this._setFlag(pipe, x-2, y-1, Direction.LEFT);  this._setFlag(pipe, x-2, y+1, Direction.LEFT);  break;
-                        case Direction.DOWN:  this._setFlag(pipe, x-1, y-2, Direction.UP);    this._setFlag(pipe, x+1, y-2, Direction.UP);    break;
-                        case Direction.LEFT:  this._setFlag(pipe, x+2, y-1, Direction.RIGHT); this._setFlag(pipe, x+2, y+1, Direction.RIGHT); break;
-                        default: break;
-                    }
+                    this._setFlag(pipe, x, y, d, -1,  2, 4);
+                    this._setFlag(pipe, x, y, d,  1,  2, 4);
                 }
             }
             else if (c === 'oil-refinery') {
-                // inputs.
-                switch (d) {
-                    case Direction.UP:
-                        this._setFlag(pipe, x+1, y+3, Direction.DOWN);
-                        this._setFlag(pipe, x-1, y+3, Direction.DOWN);
-                        break;
-                    case Direction.RIGHT:
-                        this._setFlag(pipe, x-3, y+1, Direction.LEFT);
-                        this._setFlag(pipe, x-3, y-1, Direction.LEFT);
-                        break;
-                    case Direction.DOWN:
-                        this._setFlag(pipe, x-1, y-3, Direction.UP);
-                        this._setFlag(pipe, x+1, y-3, Direction.UP);
-                        break;
-                    case Direction.LEFT:
-                        this._setFlag(pipe, x+3, y-1, Direction.RIGHT);
-                        this._setFlag(pipe, x+3, y+1, Direction.RIGHT);
-                        break;
-                    default:
-                        break;
-                }
+                this._setFlag(pipe, x, y, d,  2, -3, 0);
+                this._setFlag(pipe, x, y, d,  0, -3, 0);
+                this._setFlag(pipe, x, y, d, -2, -3, 0);
+                this._setFlag(pipe, x, y, d,  1,  3, 4);
+                this._setFlag(pipe, x, y, d, -1,  3, 4);
 
-                // outputs.
-                switch (d) {
-                    case Direction.UP:
-                        this._setFlag(pipe, x+2, y-3, d);
-                        this._setFlag(pipe, x,   y-3, d);
-                        this._setFlag(pipe, x-2, y-3, d);
-                        break;
-                    case Direction.RIGHT:
-                        this._setFlag(pipe, x+3, y+2, d);
-                        this._setFlag(pipe, x+3, y,   d);
-                        this._setFlag(pipe, x+3, y-2, d);
-                        break;
-                    case Direction.DOWN:
-                        this._setFlag(pipe, x-2, y+3, d);
-                        this._setFlag(pipe, x,   y+3, d);
-                        this._setFlag(pipe, x+2, y+3, d);
-                        break;
-                    case Direction.LEFT:
-                        this._setFlag(pipe, x-3, y-2, d);
-                        this._setFlag(pipe, x-3, y,   d);
-                        this._setFlag(pipe, x-3, y+2, d);
-                        break;
-                    default:
-                        break;
-                }
+                // TODO: basic oil processing now has less ports.
+
             }
             else if (c === 'heat-pipe') {
-                this._setFlag(heat, x, y-1, Direction.UP);
-                this._setFlag(heat, x+1, y, Direction.RIGHT);
-                this._setFlag(heat, x, y+1, Direction.DOWN);
-                this._setFlag(heat, x-1, y, Direction.LEFT);
+                this._setFlag(heat, x, y, d,  0, -1, 0);
+                this._setFlag(heat, x, y, d,  1,  0, 2);
+                this._setFlag(heat, x, y, d,  0,  1, 4);
+                this._setFlag(heat, x, y, d, -1,  0, 6);
             }
             else if (c === 'boiler') {
-                switch (d) {
-                    case Direction.UP:
-                        this._setFlag(pipe, x,   y-1.5, Direction.UP);
-                        this._setFlag(pipe, x-2, y+0.5, Direction.LEFT);
-                        this._setFlag(pipe, x+2, y+0.5, Direction.RIGHT);
-                        this._setFlag(heat, x,   y+1.5, Direction.DOWN);
-                        break;
-                    case Direction.RIGHT:
-                        this._setFlag(pipe, x+1.5, y,   Direction.RIGHT);
-                        this._setFlag(pipe, x-0.5, y-2, Direction.UP);
-                        this._setFlag(pipe, x-0.5, y+2, Direction.DOWN);
-                        this._setFlag(heat, x-1.5, y,   Direction.LEFT);
-                        break;
-                    case Direction.DOWN:
-                        this._setFlag(pipe, x,   y+1.5, Direction.DOWN);
-                        this._setFlag(pipe, x+2, y-0.5, Direction.RIGHT);
-                        this._setFlag(pipe, x-2, y-0.5, Direction.LEFT);
-                        this._setFlag(heat, x,   y-1.5, Direction.UP);
-                        break;
-                    case Direction.LEFT:
-                        this._setFlag(pipe, x-1.5, y,   Direction.LEFT);
-                        this._setFlag(pipe, x+0.5, y+2, Direction.DOWN);
-                        this._setFlag(pipe, x+0.5, y-2, Direction.UP);
-                        this._setFlag(heat, x+1.5, y,   Direction.RIGHT);
-                        break;
-                    default:
-                        break;
-                }
+                this._setFlag(pipe, x, y, d,  0, -1.5, 0);
+                this._setFlag(pipe, x, y, d,  2,  0.5, 2);
+                this._setFlag(pipe, x, y, d, -2,  0.5, 6);
+                this._setFlag(heat, x, y, d,  0,  1.5, 4);
             }
             else if (c === 'steam-engine') {
-                switch (d) {
-                    case Direction.UP:    this._setFlag(pipe, x, y-3, Direction.UP);   this._setFlag(pipe, x, y+3, Direction.DOWN);  break;
-                    case Direction.RIGHT: this._setFlag(pipe, x-3, y, Direction.LEFT); this._setFlag(pipe, x+3, y, Direction.RIGHT); break;
-                    default: break;
-                }
+                this._setFlag(pipe, x, y, d, 0, -3, 0);
+                this._setFlag(pipe, x, y, d, 0,  3, 4);
             }
             else if (c === 'nuclear-reactor') {
-                this._setFlag(heat, x-2, y-3, Direction.UP);
-                this._setFlag(heat, x,   y-3, Direction.UP);
-                this._setFlag(heat, x+2, y-3, Direction.UP);
-                this._setFlag(heat, x+3, y-2, Direction.RIGHT);
-                this._setFlag(heat, x+3, y,   Direction.RIGHT);
-                this._setFlag(heat, x+3, y+2, Direction.RIGHT);
-                this._setFlag(heat, x-2, y+3, Direction.DOWN);
-                this._setFlag(heat, x,   y+3, Direction.DOWN);
-                this._setFlag(heat, x+2, y+3, Direction.DOWN);
-                this._setFlag(heat, x-3, y-2, Direction.LEFT);
-                this._setFlag(heat, x-3, y,   Direction.LEFT);
-                this._setFlag(heat, x-3, y+2, Direction.LEFT);
+                this._setFlag(heat, x, y, d, -2, -3, 0);
+                this._setFlag(heat, x, y, d,  0, -3, 0);
+                this._setFlag(heat, x, y, d,  2, -3, 0);
+                this._setFlag(heat, x, y, d,  3, -2, 2);
+                this._setFlag(heat, x, y, d,  3,  0, 2);
+                this._setFlag(heat, x, y, d,  3,  2, 2);
+                this._setFlag(heat, x, y, d, -2,  3, 4);
+                this._setFlag(heat, x, y, d,  0,  3, 4);
+                this._setFlag(heat, x, y, d,  2,  3, 4);
+                this._setFlag(heat, x, y, d, -3, -2, 6);
+                this._setFlag(heat, x, y, d, -3,  0, 6);
+                this._setFlag(heat, x, y, d, -3,  2, 6);
             }
         }
     }
