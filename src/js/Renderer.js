@@ -1,7 +1,7 @@
 import * as THREE from 'three'
+import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { ConnectionSolver } from './ConnectionSolver'
 import { GeometryFactory } from './GeometryFactory'
-import { MapControls } from './MapControls'
 
 class Grid extends THREE.Group {
     clear() {
