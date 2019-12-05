@@ -1192,7 +1192,7 @@ export class GeometryFactory {
         }
 
         const geometry = new BufferGeometry();
-        geometry.addAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+        geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
         geometry.setIndex(new BufferAttribute(new Uint16Array(src.indices), 1));
 
         if (useCache) {

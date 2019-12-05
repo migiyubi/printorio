@@ -36,7 +36,7 @@ class Grid extends THREE.Group {
             }
 
             const geometry = new THREE.BufferGeometry();
-            geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
 
             const material = new THREE.LineBasicMaterial({
                 color: 0xffffff,
@@ -55,7 +55,7 @@ class Grid extends THREE.Group {
             const indices = [0, 1, 1, 2, 2, 3, 3, 0];
 
             const geometry = new THREE.BufferGeometry();
-            geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
             geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 
             const material = new THREE.LineBasicMaterial({
