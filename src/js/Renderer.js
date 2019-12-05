@@ -220,4 +220,28 @@ export default class Renderer {
     render() {
         this._renderer.render(this._scene, this._camera);
     }
+
+    renderToImage(scale = 10.0, margin = 1.0, maxSide = 2048) {
+        const bbox = new THREE.Box3().setFromObject(this._scene);
+
+        const l = bbox.min.x - margin;
+        const r = bbox.max.x + margin;
+        const b = bbox.min.y - margin;
+        const t = bbox.max.y + margin;
+
+        const s = Math.min(Math.min(maxSide / (r - l), maxSide / (t - b)), scale);
+
+        const w = (r - l) * s;
+        const h = (t - b) * s;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(w, h);
+
+        const camera = new THREE.OrthographicCamera(l, r, t, b, 1, 2000);
+        camera.position.z = 1000;
+
+        renderer.render(this._scene, camera);
+
+        return renderer.domElement.toDataURL();
+    }
 }

@@ -70,6 +70,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    document.querySelector('#button-save-image').addEventListener('click', () => {
+        const image = renderer.renderToImage();
+
+        const a = document.createElement('a');
+        a.href = image;
+        a.download = 'blueprint.png';
+
+        const e = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+        a.dispatchEvent(e);
+    });
+
     document.querySelector('#check-show-icons').addEventListener('change', (e) => {
         renderer.setIconsVisible(e.target.checked);
     });
