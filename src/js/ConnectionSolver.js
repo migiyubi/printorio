@@ -47,9 +47,11 @@ export class ConnectionSolver {
         this._connFlagsBelt = {};
         this._connFlagsPipe = {};
         this._connFlagsHeat = {};
+        this._connFlagsWall = {};
         const belt = this._connFlagsBelt;
         const pipe = this._connFlagsPipe;
         const heat = this._connFlagsHeat;
+        const wall = this._connFlagsWall;
 
         for (const entity of entities) {
             const d = entity.direction || 0;
@@ -155,6 +157,16 @@ export class ConnectionSolver {
                 this._setFlag(heat, x, y, d, -3,  0, 6);
                 this._setFlag(heat, x, y, d, -3,  2, 6);
             }
+            else if (c === 'stone-wall') {
+                this._setFlag(wall, x, y, d,  0, -1, 0);
+                this._setFlag(wall, x, y, d,  1,  0, 2);
+                this._setFlag(wall, x, y, d,  0,  1, 4);
+                this._setFlag(wall, x, y, d, -1,  0, 6);
+            }
+            else if (c === 'gate') {
+                this._setFlag(wall, x, y, d,  0, -1, 0);
+                this._setFlag(wall, x, y, d,  0,  1, 4);
+            }
         }
     }
 
@@ -171,6 +183,9 @@ export class ConnectionSolver {
         }
         else if (c === 'heat-pipe') {
             return this._connFlagsHeat[this._toUniqueKey(x, y)];
+        }
+        else if (c === 'stone-wall') {
+            return this._connFlagsWall[this._toUniqueKey(x, y)];
         }
         else {
             return 0;

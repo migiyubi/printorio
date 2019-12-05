@@ -418,6 +418,73 @@ const VERTICES = {
         ],
         "indices": [0, 1, 1, 2, 3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11]
     },
+    "stone-wall-rl": {
+        "positions": [
+            -0.50, -0.10,
+             0.50, -0.10,
+
+            -0.50,  0.10,
+             0.50,  0.10
+        ],
+        "indices": [0, 1, 2, 3]
+    },
+    "stone-wall-ur": {
+        "positions": [
+            -0.10, -0.50,
+            -0.10,  0.10,
+             0.50,  0.10,
+
+             0.10, -0.50,
+             0.10, -0.10,
+             0.50, -0.10
+        ],
+        "indices": [0, 1, 1, 2, 3, 4, 4, 5]
+    },
+    "stone-wall-urd": {
+        "positions": [
+            -0.10, -0.50,
+            -0.10,  0.50,
+
+             0.10, -0.50,
+             0.10, -0.10,
+             0.50, -0.10,
+
+             0.50,  0.10,
+             0.10,  0.10,
+             0.10,  0.50
+        ],
+        "indices": [0, 1, 2, 3, 3, 4, 5, 6, 6, 7]
+    },
+    "stone-wall-urdl": {
+        "positions": [
+            -0.10, -0.50,
+            -0.10, -0.10,
+            -0.50, -0.10,
+
+            -0.50,  0.10,
+            -0.10,  0.10,
+            -0.10,  0.50,
+
+             0.10, -0.50,
+             0.10, -0.10,
+             0.50, -0.10,
+
+             0.50,  0.10,
+             0.10,  0.10,
+             0.10,  0.50
+        ],
+        "indices": [0, 1, 1, 2, 3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11]
+    },
+    "gate": {
+        "positions": [
+            -0.10, -0.50,
+            -0.10,  0.50,
+
+             0.10, -0.50,
+             0.10,  0.50
+        ],
+        "indices": [0, 1, 2, 3]
+    },
     "inserter": {
         "positions": [
             -0.25,  0.70,
@@ -1058,6 +1125,8 @@ const init = () => {
 
     inflatePipeVertices('heat-pipe');
 
+    inflatePipeVertices('stone-wall');
+
     generateRailVertices(0.5, 22);
 
     addCircleVertices('nuclear-reactor', 2.0, 0, 0, 32);
@@ -1160,7 +1229,7 @@ export class GeometryFactory {
                 }
             }
         }
-        else if (connectionKey === 'pipe' || connectionKey === 'heat-pipe') {
+        else if (connectionKey === 'pipe' || connectionKey === 'heat-pipe' || connectionKey === 'stone-wall') {
             // if the pipe has less than two connections, add missing ones,
             // because there is no dead-end pipe.
             if     (!conn)        conn = 70; // horizontal straight pipe.
