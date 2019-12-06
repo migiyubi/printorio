@@ -4,6 +4,12 @@ import { ConnectionSolver } from './ConnectionSolver'
 import { GeometryFactory } from './GeometryFactory'
 
 class Grid extends THREE.Group {
+    constructor(layer = 0) {
+        super();
+
+        this._layer = layer;
+    }
+
     clear() {
         while (this.children.length > 0) {
             const child = this.children[0];
@@ -45,6 +51,7 @@ class Grid extends THREE.Group {
             });
 
             const obj = new THREE.LineSegments(geometry, material);
+            obj.layers.set(this._layer);
 
             this.add(obj);
         }
@@ -63,11 +70,16 @@ class Grid extends THREE.Group {
             });
 
             const obj = new THREE.LineSegments(geometry, material);
+            obj.layers.set(this._layer);
 
             this.add(obj);
         }
     }
 }
+
+const LAYER_MAIN = 0;
+const LAYER_ICON = 1;
+const LAYER_GRID = 2;
 
 export default class Renderer {
     constructor() {
@@ -76,6 +88,7 @@ export default class Renderer {
         this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 2000);
         this._camera.up = new THREE.Vector3(0, 0, 1);
         this._camera.position.z = 1000;
+        this._camera.layers.enableAll();
 
         this._scene = new THREE.Scene();
         this._scene.background = new THREE.Color(0x0170c1);
@@ -87,7 +100,7 @@ export default class Renderer {
         this._blueprintBody = new THREE.Group();
         this._scene.add(this._blueprintBody);
 
-        this._grid = new Grid();
+        this._grid = new Grid(LAYER_GRID);
         this._scene.add(this._grid);
 
         this._iconGroup = null;
@@ -110,7 +123,7 @@ export default class Renderer {
 
     get domElement() { return this._renderer.domElement; }
 
-    _createEntities(entities, iconsVisible) {
+    _createEntities(entities) {
         const root = new THREE.Group();
         root.scale.y = -1.0;
 
@@ -151,13 +164,12 @@ export default class Renderer {
             if (iconGeometry !== null) {
                 const icon = new THREE.LineSegments(iconGeometry, this._commonMaterial);
                 icon.position.set(entity.position.x, entity.position.y, 0);
+                icon.layers.set(LAYER_ICON);
                 iconGroup.add(icon);
             }
         }
 
-        iconGroup.visible = iconsVisible;
-
-        return { root, iconGroup };
+        return root;
     }
 
     _adjustFrame(content, margin=4) {
@@ -173,7 +185,7 @@ export default class Renderer {
         this._grid.update(size.x, size.y);
     }
 
-    setBlueprint(blueprint, iconsVisible = false) {
+    setBlueprint(blueprint) {
         const b = this._blueprintBody;
 
         while (b.children.length > 0) {
@@ -184,18 +196,19 @@ export default class Renderer {
             return;
         }
 
-        const { root, iconGroup } = this._createEntities(blueprint.entities, iconsVisible);
+        const root = this._createEntities(blueprint.entities);
 
         b.add(root);
-
-        this._iconGroup = iconGroup;
 
         this._adjustFrame(b);
     }
 
-    setIconsVisible(visible) {
-        if (this._iconGroup) {
-            this._iconGroup.visible = visible;
+    setIconsVisibility(visible) {
+        if (visible) {
+            this._camera.layers.enable(LAYER_ICON);
+        }
+        else {
+            this._camera.layers.disable(LAYER_ICON);
         }
     }
 
@@ -239,6 +252,7 @@ export default class Renderer {
 
         const camera = new THREE.OrthographicCamera(l, r, t, b, 1, 2000);
         camera.position.z = 1000;
+        camera.layers.mask = this._camera.layers.mask;
 
         renderer.render(this._scene, camera);
 
