@@ -119,6 +119,10 @@ export default class Renderer {
 
         this._geometryFactory = new GeometryFactory();
         this._connectionSolver = new ConnectionSolver();
+
+        this._offscreenRenderer = new THREE.WebGLRenderer({ antialias: true });
+        this._offscreenCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 2000);
+        this._offscreenCamera.position.z = 1000;
     }
 
     get domElement() { return this._renderer.domElement; }
@@ -244,18 +248,21 @@ export default class Renderer {
 
         const s = Math.min(Math.min(maxSide / (r - l), maxSide / (t - b)), scale);
 
-        const w = (r - l) * s;
-        const h = (t - b) * s;
+        const w = Math.round((r - l) * s);
+        const h = Math.round((t - b) * s);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(w, h);
+        this._offscreenRenderer.setSize(w, h);
 
-        const camera = new THREE.OrthographicCamera(l, r, t, b, 1, 2000);
-        camera.position.z = 1000;
-        camera.layers.mask = this._camera.layers.mask;
+        this._offscreenCamera.left = l;
+        this._offscreenCamera.right = r;
+        this._offscreenCamera.bottom = b;
+        this._offscreenCamera.top = t;
+        this._offscreenCamera.updateProjectionMatrix();
 
-        renderer.render(this._scene, camera);
+        this._offscreenCamera.layers.mask = this._camera.layers.mask;
 
-        return renderer.domElement.toDataURL();
+        this._offscreenRenderer.render(this._scene, this._offscreenCamera);
+
+        return this._offscreenRenderer.domElement;
     }
 }

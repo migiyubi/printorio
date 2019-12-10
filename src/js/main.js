@@ -40,6 +40,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         blueprintSelector.select(currentBook['active_index']);
     }
 
+    const saveUrl = (url) => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'blueprint.png';
+
+        const e = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+
+        document.body.appendChild(a);
+        a.dispatchEvent(e);
+        document.body.removeChild(a);
+    };
+
     const updateIconsVisibility = () => {
         renderer.setIconsVisibility(checkShowIcons.checked);
     }
@@ -75,18 +91,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.querySelector('#button-save-image').addEventListener('click', () => {
-        const image = renderer.renderToImage();
+        const canvas = renderer.renderToImage();
 
-        const a = document.createElement('a');
-        a.href = image;
-        a.download = 'blueprint.png';
-
-        const e = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-        });
-        a.dispatchEvent(e);
+        if (canvas.toBlob) {
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                saveUrl(url);
+                URL.revokeObjectURL(url);
+            });
+        }
+        else {
+            saveUrl(canvas.toDataURL());
+        }
     });
 
     const checkShowIcons = document.querySelector('#check-show-icons');
