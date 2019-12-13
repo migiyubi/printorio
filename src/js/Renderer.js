@@ -110,7 +110,7 @@ export default class Renderer {
         this._controls.minZoom = 0.5;
         this._controls.maxZoom = 8.0;
         this._controls.maxPolarAngle = 1.5;
-        this._controls.screenSpacePanning = false;
+        this._controls.screenSpacePanning = true;
         this._renderer.domElement.addEventListener('mouseup', (e) => {
             if (e.button === 1) {
                 this._controls.reset();
