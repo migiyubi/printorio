@@ -819,7 +819,7 @@ const VERTICES = {
     }
 }
 
-const inflatePipeVertices = (prefix='pipe') => {
+const inflate4NeighborVertices = (prefix='pipe') => {
     const rotate90cw = (src) => {
         const dst = {
             "positions": [],
@@ -1121,11 +1121,11 @@ const generateIconRadiationSymbolVertices = (size=1.6, x=0.0, y=0.0) => {
 };
 
 const init = () => {
-    inflatePipeVertices('pipe');
+    inflate4NeighborVertices('pipe');
 
-    inflatePipeVertices('heat-pipe');
+    inflate4NeighborVertices('heat-pipe');
 
-    inflatePipeVertices('stone-wall');
+    inflate4NeighborVertices('stone-wall');
 
     generateRailVertices(0.5, 22);
 
