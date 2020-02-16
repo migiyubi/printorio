@@ -238,7 +238,7 @@ export default class Renderer {
         this._renderer.render(this._scene, this._camera);
     }
 
-    renderToImage(scale = 10.0, margin = 1.0, maxSide = 2048) {
+    renderToImage(scale = 10.0, margin = 1.0, maxSide = 0) {
         const bbox = new THREE.Box3().setFromObject(this._scene);
 
         const l = bbox.min.x - margin;
@@ -246,7 +246,7 @@ export default class Renderer {
         const b = bbox.min.y - margin;
         const t = bbox.max.y + margin;
 
-        const s = Math.min(Math.min(maxSide / (r - l), maxSide / (t - b)), scale);
+        const s = (maxSide > 0) ? (Math.min(Math.min(maxSide / (r - l), maxSide / (t - b)), scale)) : scale;
 
         const w = Math.round((r - l) * s);
         const h = Math.round((t - b) * s);
