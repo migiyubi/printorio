@@ -51,8 +51,7 @@ const DrawingEquivalentDict = {
     "centrifuge": "rect3x3",
     "electric-mining-drill": "rect3x3",
     "radar": "rect3x3",
-    "solar-panel": "rect3x3",
-    "roboport": "rect4x4"
+    "solar-panel": "rect3x3"
 };
 
 const IconKeyDict = {
@@ -541,6 +540,24 @@ const VERTICES = {
         ],
         "indices": [0, 1, 1, 2, 2, 3, 3, 0]
     },
+    "roboport": {
+        "positions": [
+            -1.90,  1.90,
+            -1.90, -1.90,
+             1.90, -1.90,
+             1.90,  1.90,
+
+            -1.00, -1.90,
+            -1.90, -1.00,
+             1.00, -1.90,
+             1.90, -1.00,
+            -1.00,  1.90,
+            -1.90,  1.00,
+             1.00,  1.90,
+             1.90,  1.00
+        ],
+        "indices": [0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 6, 7, 8, 9, 10, 11]
+    },
     "electric-furnace": {
         "positions": [
             -1.40,  1.40,
@@ -780,15 +797,6 @@ const VERTICES = {
             -1.40, -1.40,
              1.40, -1.40,
              1.40,  1.40
-        ],
-        "indices": [0, 1, 1, 2, 2, 3, 3, 0]
-    },
-    "rect4x4": {
-        "positions": [
-            -1.90,  1.90,
-            -1.90, -1.90,
-             1.90, -1.90,
-             1.90,  1.90
         ],
         "indices": [0, 1, 1, 2, 2, 3, 3, 0]
     },
@@ -1130,7 +1138,8 @@ const init = () => {
 
     addCircleVertices('nuclear-reactor', 2.0, 0, 0, 32);
     addCircleVertices('storage-tank', 1.4, 0, 0, 32);
-    addCircleVertices('rocket-silo', 4.0, 0, 0, 48)
+    addCircleVertices('rocket-silo', 4.0, 0, 0, 48);
+    addCircleVertices('roboport', 1.2, 0, 0, 32);
 
     addCircleVertices('fluid-wagon', 0.8, 0, -2);
     addCircleVertices('fluid-wagon', 0.8, 0, 0);
