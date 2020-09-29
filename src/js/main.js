@@ -27,6 +27,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    const loadBlueprintFromUrl = async (url) => {
+        try {
+            const book = await loader.decodeFromUrl(url, true);
+            setBlueprintBook(book);
+        }
+        catch(e) {
+            alert('Failed to decode string.\nThe blueprint is corrupted or using an unsupported version.');
+        }
+    };
+
     const setBlueprintBook = async (blueprintBook) => {
         currentBook = blueprintBook['blueprint_book'];
 
@@ -138,6 +148,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (params['string'] !== undefined) {
         loadBlueprintString(params['string']);
+        return;
+    }
+    else if (params['url'] !== undefined) {
+        loadBlueprintFromUrl(params['url']);
         return;
     }
 
