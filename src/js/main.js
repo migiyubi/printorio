@@ -6,11 +6,11 @@ import Renderer from './Renderer'
 
 document.addEventListener('DOMContentLoaded', async () => {
     const loader = new BlueprintLoader();
-    let currentBook = null;
+    let currentBlueprints = [];
 
     const blueprintSelector = new BlueprintSelector((selectedId) => {
         const id = parseInt(selectedId, 10);
-        const blueprint = currentBook['blueprints'].find((elem) => elem['index'] === id)['blueprint'];
+        const blueprint = currentBlueprints[id];
         renderer.setBlueprint(blueprint);
     }, document.querySelector('#select-blueprint'));
 
@@ -37,17 +37,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    const setBlueprintBook = async (blueprintBook) => {
-        currentBook = blueprintBook['blueprint_book'];
+    const extractBlueprinTree = (blueprintTree, dst=[]) => {
+        if (blueprintTree['blueprint_book']) {
+            for (const bp of blueprintTree['blueprint_book']['blueprints']) {
+                extractBlueprinTree(bp, dst);
+            }
+        }
 
+        if (blueprintTree['blueprint']) {
+            dst.push(blueprintTree['blueprint']);
+        }
+
+        return dst;
+    };
+
+    const setBlueprintBook = async (blueprintBook) => {
+        currentBlueprints = extractBlueprinTree(blueprintBook);
+
+        let index = 0;
+        let autoId = 0;
         const blueprintIdMap = {};
-        for (const bp of currentBook['blueprints']) {
-            const id = bp['index'];
-            const name = bp['blueprint']['label'] || `untitled-${id}`;
-            blueprintIdMap[id] = name;
+        for (const bp of currentBlueprints) {
+            const name = bp['label'] || `untitled-${autoId++}`;
+            blueprintIdMap[index] = name;
+            ++index;
         }
         blueprintSelector.setData(blueprintIdMap);
-        blueprintSelector.select(currentBook['active_index']);
+        blueprintSelector.select(0);
     }
 
     const saveUrl = (url) => {
