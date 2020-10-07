@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loadBlueprintString = async (source) => {
         try {
-            const book = await loader.decodeString(source, true);
-            setBlueprintBook(book);
+            const bp = await loader.decodeString(source);
+            setBlueprintTree(bp);
         }
         catch(e) {
             alert('Failed to decode string.\nThe blueprint is corrupted or using an unsupported version.');
@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loadBlueprintFromUrl = async (url) => {
         try {
-            const book = await loader.decodeFromUrl(url, true);
-            setBlueprintBook(book);
+            const bp = await loader.decodeFromUrl(url);
+            setBlueprintTree(bp);
         }
         catch(e) {
             alert('Failed to decode string.\nThe blueprint is corrupted or using an unsupported version.');
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return dst;
     };
 
-    const setBlueprintBook = async (blueprintBook) => {
-        currentBlueprints = extractBlueprinTree(blueprintBook);
+    const setBlueprintTree = async (blueprintTree) => {
+        currentBlueprints = extractBlueprinTree(blueprintTree);
 
         let index = 0;
         let autoId = 0;
