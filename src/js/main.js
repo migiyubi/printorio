@@ -116,7 +116,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    let saving = false;
     document.querySelector('#button-save-image').addEventListener('click', () => {
+        if (saving) {
+            return;
+        }
+
+        saving = true;
+
         const canvas = renderer.renderToImage();
 
         if (canvas.toBlob) {
@@ -124,10 +131,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const url = URL.createObjectURL(blob);
                 saveUrl(url);
                 URL.revokeObjectURL(url);
+                saving = false;
             });
         }
         else {
             saveUrl(canvas.toDataURL());
+            saving = false;
         }
     });
 
