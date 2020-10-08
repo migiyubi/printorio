@@ -4,8 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "webpack",
-    "autobuild": "webpack --watch"
+    "build": "webpack --mode=production",
+    "autobuild": "webpack --mode=production --watch",
+    "build-dev": "webpack --mode=development",
+    "autobuild-dev": "webpack --mode=development --watch"
   },
   "author": "migiyubi",
   "license": "MIT",
