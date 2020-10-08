@@ -84,6 +84,7 @@ const LAYER_GRID = 2;
 export default class Renderer {
     constructor() {
         this._renderer = new THREE.WebGLRenderer({ antialias: true });
+        this._renderer.setPixelRatio(window.devicePixelRatio);
 
         this._camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 2000);
         this._camera.up = new THREE.Vector3(0, 0, 1);
