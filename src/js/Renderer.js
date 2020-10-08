@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { ConnectionSolver } from './ConnectionSolver'
 import { GeometryFactory } from './GeometryFactory'
@@ -132,12 +133,10 @@ export default class Renderer {
         const root = new THREE.Group();
         root.scale.y = -1.0;
 
-        const entitiyGroup = new THREE.Group();
-        const iconGroup = new THREE.Group();
-        root.add(entitiyGroup);
-        root.add(iconGroup);
-
         this._connectionSolver.init(entities);
+
+        const entityGeometries = [];
+        const iconGeometries = [];
 
         for (const entity of entities) {
             const n = entity.name;
@@ -158,20 +157,36 @@ export default class Renderer {
                 rotation += option ? 0.25*Math.PI : 0.0;
             }
 
-            const geometry = this._geometryFactory.create(entity, conn);
-            const obj = new THREE.LineSegments(geometry, this._commonMaterial);
-            obj.position.set(entity.position.x, entity.position.y, 0);
-            obj.scale.x = flipHorizontal ? -1.0 : 1.0;
-            obj.rotation.z = rotation;
-            entitiyGroup.add(obj);
-
-            const iconGeometry = this._geometryFactory.createIcon(entity, conn);
-            if (iconGeometry !== null) {
-                const icon = new THREE.LineSegments(iconGeometry, this._commonMaterial);
-                icon.position.set(entity.position.x, entity.position.y, 0);
-                icon.layers.set(LAYER_ICON);
-                iconGroup.add(icon);
+            {
+                const g = this._geometryFactory.create(entity, conn, false);
+                if (g != null) {
+                    g.scale(flipHorizontal ? -1.0 : 1.0, 1.0, 1.0);
+                    g.rotateZ(rotation);
+                    g.translate(entity.position.x, entity.position.y, 0);
+                    entityGeometries.push(g);
+                }
             }
+
+            {
+                const g = this._geometryFactory.createIcon(entity, conn, false);
+                if (g !== null) {
+                    g.translate(entity.position.x, entity.position.y, 0);
+                    iconGeometries.push(g);
+                }
+            }
+        }
+
+        if (entityGeometries.length > 0) {
+            const g = BufferGeometryUtils.mergeBufferGeometries(entityGeometries);
+            const m = new THREE.LineSegments(g, this._commonMaterial);
+            root.add(m);
+        }
+
+        if (iconGeometries.length > 0) {
+            const g = BufferGeometryUtils.mergeBufferGeometries(iconGeometries);
+            const m = new THREE.LineSegments(g, this._commonMaterial);
+            m.layers.set(LAYER_ICON);
+            root.add(m);
         }
 
         return root;
