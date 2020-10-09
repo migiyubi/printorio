@@ -1,4 +1,4 @@
-export default class BlueprintSelector {
+export class BlueprintSelector {
     constructor(callback, domElement = document.createElement('select')) {
         this._domElement = domElement;
         this._callback = callback;

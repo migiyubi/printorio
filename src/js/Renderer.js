@@ -87,7 +87,7 @@ const LAYER_MAIN = 0;
 const LAYER_ICON = 1;
 const LAYER_GRID = 2;
 
-export default class Renderer {
+export class Renderer {
     constructor() {
         this._renderer = new THREE.WebGLRenderer({ antialias: true });
         this._renderer.setPixelRatio(window.devicePixelRatio);

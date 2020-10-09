@@ -1,9 +1,9 @@
 import style from '../css/main.css'
 
 import { BlueprintLoader } from './Blueprint'
-import BlueprintSelector from './BlueprintSelector'
+import { BlueprintSelector } from './BlueprintSelector'
 import { ColorPicker } from './ColorPicker'
-import Renderer from './Renderer'
+import { Renderer } from './Renderer'
 
 document.addEventListener('DOMContentLoaded', async () => {
     const loader = new BlueprintLoader();
