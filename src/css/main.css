@@ -14,13 +14,14 @@ canvas {
 .container {
   padding: 4px 8px;
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   background-color: #444444;
   box-shadow: 0 1px 4px #222222;
 }
 
 .container > div {
-  margin: 4px 6px;
+  margin: 4px 8px;
 }
 
 .container > div:last-child {
