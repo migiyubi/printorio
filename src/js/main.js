@@ -2,6 +2,7 @@ import style from '../css/main.css'
 
 import { BlueprintLoader } from './Blueprint'
 import BlueprintSelector from './BlueprintSelector'
+import { ColorPicker } from './ColorPicker'
 import Renderer from './Renderer'
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -13,6 +14,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const blueprint = currentBlueprints[id];
         renderer.setBlueprint(blueprint);
     }, document.querySelector('#select-blueprint'));
+
+    const colorPickerBackground = new ColorPicker((color) => {
+        renderer.setBackgroundColor(color);
+    }, document.querySelector('#color-background'));
+
+    const colorPickerLine = new ColorPicker((color) => {
+        renderer.setLineColor(color);
+    }, document.querySelector('#color-line'));
 
     const renderer = new Renderer();
     document.body.appendChild(renderer.domElement);
@@ -167,6 +176,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     updateIconsVisibility();
+    colorPickerLine.set('#ffffff');
+    colorPickerBackground.set('#0170c1');
 
     const params = location.search.substr(1).split('&').map(p => p.split('='))
             .reduce((map, p) => Object.assign({ [p[0]]: p[1] }, map), {});

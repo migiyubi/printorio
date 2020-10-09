@@ -22,6 +22,8 @@ canvas {
 
 .container > div {
   margin: 4px 8px;
+  display: flex;
+  align-items: center;
 }
 
 .container > div:last-child {
@@ -34,6 +36,10 @@ input[type=button] {
 
 input[type=checkbox] {
   vertical-align: middle;
+}
+
+input[type=color] {
+  margin: 0 12px 0 4px;
 }
 
 .text {

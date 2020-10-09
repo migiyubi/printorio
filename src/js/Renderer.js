@@ -8,6 +8,16 @@ class Grid extends THREE.Group {
     constructor(layer = 0) {
         super();
 
+        this._materialBody = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.2
+        });
+
+        this._materialEdge = new THREE.LineBasicMaterial({
+            color: 0xffffff
+        });
+
         this._layer = layer;
     }
 
@@ -45,13 +55,7 @@ class Grid extends THREE.Group {
             const geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
 
-            const material = new THREE.LineBasicMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.2
-            });
-
-            const obj = new THREE.LineSegments(geometry, material);
+            const obj = new THREE.LineSegments(geometry, this._materialBody);
             obj.layers.set(this._layer);
 
             this.add(obj);
@@ -66,15 +70,16 @@ class Grid extends THREE.Group {
             geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
             geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 
-            const material = new THREE.LineBasicMaterial({
-                color: 0xffffff
-            });
-
-            const obj = new THREE.LineSegments(geometry, material);
+            const obj = new THREE.LineSegments(geometry, this._materialEdge);
             obj.layers.set(this._layer);
 
             this.add(obj);
         }
+    }
+
+    setColor(color) {
+        this._materialBody.color.set(color);
+        this._materialEdge.color.set(color);
     }
 }
 
@@ -221,6 +226,15 @@ export default class Renderer {
         b.add(root);
 
         this._adjustFrame(b);
+    }
+
+    setBackgroundColor(color) {
+        this._scene.background.set(color);
+    }
+
+    setLineColor(color) {
+        this._commonMaterial.color.set(color);
+        this._grid.setColor(color);
     }
 
     setIconsVisibility(visible) {
