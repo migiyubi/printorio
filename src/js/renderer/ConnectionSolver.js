@@ -2,7 +2,7 @@ import {
     Direction,
     RecipesHaveFluidInput,
     RecipesHaveNoFluidOutput
-} from './Blueprint'
+} from '../Blueprint'
 
 export const ConnectionEquivalentDict = {
     "transport-belt": "transport-belt",

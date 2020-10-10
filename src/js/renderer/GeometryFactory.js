@@ -7,7 +7,7 @@ import {
     Direction,
     RecipesHaveFluidInput,
     RecipesHaveNoFluidOutput
-} from './Blueprint'
+} from '../Blueprint'
 
 import {
     ConnectionEquivalentDict
