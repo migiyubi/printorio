@@ -2,6 +2,7 @@ import style from '../css/main.css'
 
 import { BlueprintLoader } from './Blueprint'
 import { BlueprintSelector } from './BlueprintSelector'
+import { CheckBox } from './CheckBox'
 import { ColorPicker } from './ColorPicker'
 import { Renderer } from './Renderer'
 
@@ -14,6 +15,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const blueprint = currentBlueprints[id];
         renderer.setBlueprint(blueprint);
     }, document.querySelector('#select-blueprint'));
+
+    const checkboxIconVisibility = new CheckBox((checked) => {
+        renderer.setIconsVisibility(checked);
+    }, document.querySelector('#check-show-icons'));
 
     const colorPickerBackground = new ColorPicker((color) => {
         renderer.setBackgroundColor(color);
@@ -91,10 +96,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.removeChild(a);
     };
 
-    const updateIconsVisibility = () => {
-        renderer.setIconsVisibility(checkShowIcons.checked);
-    }
-
     const onResize = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
     };
@@ -149,11 +150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    const checkShowIcons = document.querySelector('#check-show-icons');
-    checkShowIcons.addEventListener('change', (e) => {
-        updateIconsVisibility();
-    });
-
     document.addEventListener('dragenter', (e) => { e.preventDefault(); });
     document.addEventListener('dragover',  (e) => { e.preventDefault(); });
     document.addEventListener('dragleave', (e) => { e.preventDefault(); });
@@ -175,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         onResize();
     });
 
-    updateIconsVisibility();
+    checkboxIconVisibility.set(false);
     colorPickerLine.set('#ffffff');
     colorPickerBackground.set('#0170c1');
 
