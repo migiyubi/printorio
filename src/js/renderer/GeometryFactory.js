@@ -7,11 +7,11 @@ import {
     Direction,
     RecipesHaveFluidInput,
     RecipesHaveNoFluidOutput
-} from '../Blueprint'
+} from 'Blueprint'
 
 import {
     ConnectionEquivalentDict
-} from './ConnectionSolver'
+} from 'renderer/ConnectionSolver'
 
 const DrawingEquivalentDict = {
     "wooden-chest": "chest",

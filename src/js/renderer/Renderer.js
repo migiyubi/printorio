@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
-import { ConnectionSolver } from './ConnectionSolver'
-import { GeometryFactory } from './GeometryFactory'
+import { ConnectionSolver } from 'renderer/ConnectionSolver'
+import { GeometryFactory } from 'renderer/GeometryFactory'
 
 class Grid extends THREE.Group {
     constructor(layer = 0) {

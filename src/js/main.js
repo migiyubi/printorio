@@ -1,10 +1,10 @@
-import style from '../css/main.css'
+import style from 'css/main.css'
 
-import { BlueprintLoader } from './Blueprint'
-import { BlueprintSelector } from './ui/BlueprintSelector'
-import { CheckBox } from './ui/CheckBox'
-import { ColorPicker } from './ui/ColorPicker'
-import { Renderer } from './renderer/Renderer'
+import { BlueprintLoader } from 'Blueprint'
+import { BlueprintSelector } from 'ui/BlueprintSelector'
+import { CheckBox } from 'ui/CheckBox'
+import { ColorPicker } from 'ui/ColorPicker'
+import { Renderer } from 'renderer/Renderer'
 
 document.addEventListener('DOMContentLoaded', async () => {
     const loader = new BlueprintLoader();

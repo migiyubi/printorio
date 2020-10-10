@@ -30,6 +30,13 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    modules: [
+      path.join(src),
+      path.join(src, 'js'),
+      'node_modules'
+    ]
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: './html/index.html',
