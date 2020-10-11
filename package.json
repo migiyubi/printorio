@@ -11,6 +11,10 @@
   },
   "author": "migiyubi",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/migiyubi/printorio"
+  },
   "devDependencies": {
     "copy-webpack-plugin": "^6.1.1",
     "css-loader": "^4.3.0",
