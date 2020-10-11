@@ -20,7 +20,10 @@
     "style-loader": "^1.2.1",
     "url-loader": "^4.1.0",
     "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-pwa-manifest": "^4.2.0",
+    "workbox-sw": "^5.1.4",
+    "workbox-webpack-plugin": "^5.1.4"
   },
   "dependencies": {
     "three": "^0.120.1"

@@ -1,6 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const WebpackPwaManifest = require("webpack-pwa-manifest");
+const WorkBoxWebpackPlugin = require("workbox-webpack-plugin");
 
 const src = path.resolve(__dirname, 'src')
 const dist = path.resolve(__dirname, 'dist')
@@ -46,6 +48,23 @@ module.exports = {
       patterns: [
         { from: src + '/assets', to: dist + '/assets' }
       ]
+    }),
+    new WebpackPwaManifest({
+      short_name: 'FBP Viewer',
+      name: 'Factorio Blueprint Viewer',
+      display: 'standalone',
+      start_url: 'index.html',
+      background_color: '#000000',
+      theme_color: '#000000',
+      icons: [{
+        src: path.join(src, 'icon_512.png'),
+        destination: path.join('assets', 'icons'),
+        sizes: [192, 512],
+      }],
+      fingerprints: false
+    }),
+    new WorkBoxWebpackPlugin.GenerateSW({
+      inlineWorkboxRuntime: true
     })
   ],
   mode: 'production'
