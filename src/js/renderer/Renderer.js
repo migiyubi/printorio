@@ -114,7 +114,7 @@ export class Renderer {
 
         this._controls = new MapControls(this._camera, this._renderer.domElement);
         this._controls.zoomSpeed = 2.0;
-        this._controls.minZoom = 0.5;
+        this._controls.minZoom = 0.4;
         this._controls.maxZoom = 8.0;
         this._controls.maxPolarAngle = 1.5;
         this._controls.screenSpacePanning = true;
