@@ -72,7 +72,7 @@ module.exports = {
         sizes: [192, 512],
       }],
       fingerprints: false,
-      publicPath: '/',
+      publicPath: './',
     }),
     new WorkBoxWebpackPlugin.GenerateSW({
       inlineWorkboxRuntime: true
