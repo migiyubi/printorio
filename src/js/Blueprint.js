@@ -1,4 +1,5 @@
 import zlib from 'zlib'
+import { Buffer } from 'buffer'
 
 export const Direction = {
     UP: 0,

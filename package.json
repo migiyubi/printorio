@@ -29,6 +29,12 @@
     "workbox-webpack-plugin": "^6.1.1"
   },
   "dependencies": {
-    "three": "^0.126.1"
+    "assert": "^2.0.0",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "three": "^0.126.1",
+    "util": "^0.12.3"
   }
 }

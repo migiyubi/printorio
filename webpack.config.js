@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const WebpackPwaManifest = require("webpack-pwa-manifest");
@@ -37,9 +38,18 @@ module.exports = {
       path.join(src),
       path.join(src, 'js'),
       'node_modules'
-    ]
+    ],
+    fallback: {
+      assert: require.resolve('assert'),
+      stream: require.resolve('stream-browserify'),
+      util: require.resolve('util'),
+      zlib: require.resolve('browserify-zlib')
+    }
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
     new HtmlWebpackPlugin({
       template: './html/index.html',
       inject: 'head'
@@ -61,7 +71,8 @@ module.exports = {
         destination: path.join('assets', 'icons'),
         sizes: [192, 512],
       }],
-      fingerprints: false
+      fingerprints: false,
+      publicPath: '/',
     }),
     new WorkBoxWebpackPlugin.GenerateSW({
       inlineWorkboxRuntime: true
