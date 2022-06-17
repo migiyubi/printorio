@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils'
+import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { ConnectionSolver } from 'renderer/ConnectionSolver'
 import { GeometryFactory } from 'renderer/GeometryFactory'
@@ -182,13 +182,13 @@ export class Renderer {
         }
 
         if (entityGeometries.length > 0) {
-            const g = BufferGeometryUtils.mergeBufferGeometries(entityGeometries);
+            const g = mergeBufferGeometries(entityGeometries);
             const m = new THREE.LineSegments(g, this._commonMaterial);
             root.add(m);
         }
 
         if (iconGeometries.length > 0) {
-            const g = BufferGeometryUtils.mergeBufferGeometries(iconGeometries);
+            const g = mergeBufferGeometries(iconGeometries);
             const m = new THREE.LineSegments(g, this._commonMaterial);
             m.layers.set(LAYER_ICON);
             root.add(m);
